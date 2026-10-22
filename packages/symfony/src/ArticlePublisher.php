@@ -16,8 +16,7 @@ final class ArticlePublisher implements PublisherContract
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UrlGeneratorInterface $urls,
-    ) {
-    }
+    ) {}
 
     public function publish(Article $article): PublishedArticle
     {

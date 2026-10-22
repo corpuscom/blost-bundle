@@ -33,8 +33,8 @@ final class SymfonyBlogIntegrationTest extends TestCase
     {
         $this->previousExceptionHandler = set_exception_handler(static function (): void {});
         restore_exception_handler();
-        $this->directory = sys_get_temp_dir().'/blost-blog-'.bin2hex(random_bytes(6));
-        mkdir($this->directory.'/migrations', 0777, true);
+        $this->directory = sys_get_temp_dir() . '/blost-blog-' . bin2hex(random_bytes(6));
+        mkdir($this->directory . '/migrations', 0777, true);
         $this->kernel = new SymfonyBlogTestKernel($this->directory);
         foreach ([['command' => 'doctrine:migrations:diff'], ['command' => 'doctrine:migrations:migrate', '--no-interaction' => true]] as $arguments) {
             $application = new Application($this->kernel);
@@ -73,12 +73,12 @@ final class SymfonyBlogIntegrationTest extends TestCase
             'language' => 'Hungarian', 'published_at' => '2020-01-01T12:00:00+02:00'];
         $response = $this->publish($payload);
         self::assertSame(200, $response->getStatusCode(), $response->getContent());
-        self::assertSame('https://example.com/news/'.BlostApiTest::ID, json_decode($response->getContent(), true)['url']);
+        self::assertSame('https://example.com/news/' . BlostApiTest::ID, json_decode($response->getContent(), true)['url']);
         $this->em()->clear();
         $post = $this->em()->find(Post::class, BlostApiTest::ID);
         self::assertSame('2020-01-01 10:00:00', $post->publishedAt->format('Y-m-d H:i:s'));
         self::assertSame('Hungarian', $post->language);
-        $html = $this->request('/news/'.BlostApiTest::ID);
+        $html = $this->request('/news/' . BlostApiTest::ID);
         self::assertSame(200, $html->getStatusCode(), $html->getContent());
         self::assertStringContainsString('<h2>Editorial HTML</h2>', $html->getContent());
         self::assertStringContainsString('&lt;Title&gt;', $html->getContent());
@@ -99,7 +99,7 @@ final class SymfonyBlogIntegrationTest extends TestCase
         self::assertNull($post->language);
         self::assertSame('2020-01-01 10:00:00', $post->publishedAt->format('Y-m-d H:i:s'));
         self::assertSame(200, $this->publish(['title' => 'Future', 'content' => 'Later', 'published_at' => '2099-01-01T00:00:00Z'])->getStatusCode());
-        self::assertSame(404, $this->request('/news/'.BlostApiTest::ID)->getStatusCode());
+        self::assertSame(404, $this->request('/news/' . BlostApiTest::ID)->getStatusCode());
         self::assertStringNotContainsString('Future', $this->request('/news')->getContent());
     }
 
@@ -107,7 +107,7 @@ final class SymfonyBlogIntegrationTest extends TestCase
     {
         for ($i = 0; $i < 21; ++$i) {
             $post = new Post();
-            $post->apply(new \Corpuscom\Blost\Article(sprintf('00000000-0000-0000-0000-%012d', $i), 'Post '.$i, 'Body', null, null, null, null, null, new \DateTimeImmutable('2020-01-01T00:00:00Z')));
+            $post->apply(new \Corpuscom\Blost\Article(sprintf('00000000-0000-0000-0000-%012d', $i), 'Post ' . $i, 'Body', null, null, null, null, null, new \DateTimeImmutable('2020-01-01T00:00:00Z')));
             $this->em()->persist($post);
         }
         $this->em()->flush();
@@ -164,13 +164,20 @@ final class SymfonyBlogIntegrationTest extends TestCase
 
     private function request(string $path, array $server = []): \Symfony\Component\HttpFoundation\Response
     {
-        return $this->kernel->handle(Request::create('https://example.com'.$path, 'GET', [], [], [], $server));
+        return $this->kernel->handle(Request::create('https://example.com' . $path, 'GET', [], [], [], $server));
     }
 
     private function publish(array $payload, bool $authorized = true): \Symfony\Component\HttpFoundation\Response
     {
-        return $this->kernel->handle(Request::create('https://example.com/blost/v1/articles/'.BlostApiTest::ID, 'PUT', [], [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => $authorized ? 'Bearer secret' : ''], json_encode($payload)));
+        return $this->kernel->handle(Request::create(
+            'https://example.com/blost/v1/articles/' . BlostApiTest::ID,
+            'PUT',
+            [],
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => $authorized ? 'Bearer secret' : ''],
+            json_encode($payload),
+        ));
     }
 }
 
@@ -192,8 +199,8 @@ final class SymfonyBlogTestKernel extends Kernel
             $container->loadFromExtension('framework', ['secret' => 'test', 'http_method_override' => false,
                 'router' => ['resource' => '@BlostBlogBundle/config/routes.php', 'utf8' => true], 'test' => true]);
             $container->loadFromExtension('twig', []);
-            $container->loadFromExtension('doctrine', ['dbal' => ['driver' => 'pdo_sqlite', 'path' => $this->directory.'/db.sqlite'], 'orm' => []]);
-            $container->loadFromExtension('doctrine_migrations', ['migrations_paths' => ['BlostTestMigrations'.md5($this->directory) => $this->directory.'/migrations']]);
+            $container->loadFromExtension('doctrine', ['dbal' => ['driver' => 'pdo_sqlite', 'path' => $this->directory . '/db.sqlite'], 'orm' => []]);
+            $container->loadFromExtension('doctrine_migrations', ['migrations_paths' => ['BlostTestMigrations' . md5($this->directory) => $this->directory . '/migrations']]);
             $container->loadFromExtension('blost', ['token' => 'secret']);
             $container->loadFromExtension('blost_blog', ['prefix' => '/news', 'title' => 'Test blog']);
         });
@@ -201,16 +208,16 @@ final class SymfonyBlogTestKernel extends Kernel
 
     protected function getContainerClass(): string
     {
-        return parent::getContainerClass().'_'.md5($this->directory);
+        return parent::getContainerClass() . '_' . md5($this->directory);
     }
 
     public function getCacheDir(): string
     {
-        return $this->directory.'/cache';
+        return $this->directory . '/cache';
     }
 
     public function getLogDir(): string
     {
-        return $this->directory.'/logs';
+        return $this->directory . '/logs';
     }
 }

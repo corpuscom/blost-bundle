@@ -11,9 +11,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 
 final class ArticlePublisher implements PublisherContract
 {
-    public function __construct(private readonly UrlGenerator $urls)
-    {
-    }
+    public function __construct(private readonly UrlGenerator $urls) {}
 
     public function publish(Article $article): PublishedArticle
     {

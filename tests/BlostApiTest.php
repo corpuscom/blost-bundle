@@ -18,8 +18,8 @@ final class BlostApiTest extends TestCase
 
     private function request(string $body, string $token = 'secret', string $contentType = 'application/json'): Request
     {
-        return Request::create('/blost/v1/articles/'.self::ID, 'PUT', [], [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer '.$token, 'CONTENT_TYPE' => $contentType,
+        return Request::create('/blost/v1/articles/' . self::ID, 'PUT', [], [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token, 'CONTENT_TYPE' => $contentType,
         ], $body);
     }
 

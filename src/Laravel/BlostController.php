@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class BlostController
 {
-    public function __construct(private readonly BlostApi $api)
-    {
-    }
+    public function __construct(private readonly BlostApi $api) {}
 
     public function status(Request $request): JsonResponse
     {

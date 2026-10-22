@@ -22,7 +22,7 @@ final class BlostBlogExtension extends Extension implements PrependExtensionInte
         $container->prependExtensionConfig('twig', ['globals' => ['blost_blog_title' => $config['title']]]);
         $container->prependExtensionConfig('blost', ['publisher' => ArticlePublisher::class]);
         $container->prependExtensionConfig('doctrine', ['dbal' => ['types' => [UtcDateTimeType::NAME => UtcDateTimeType::class]], 'orm' => ['mappings' => ['BlostBlog' => [
-            'is_bundle' => false, 'type' => 'attribute', 'dir' => dirname(__DIR__).'/Entity',
+            'is_bundle' => false, 'type' => 'attribute', 'dir' => dirname(__DIR__) . '/Entity',
             'prefix' => 'Corpuscom\\Blost\\SymfonyBlog\\Entity',
         ]]]]);
     }

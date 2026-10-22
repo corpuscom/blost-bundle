@@ -16,7 +16,7 @@ final class SymfonyIntegrationTest extends TestCase
 {
     public function testBundleBootsAndServesAuthenticatedRoutes(): void
     {
-        $kernel = new class('test', true) extends Kernel {
+        $kernel = new class ('test', true) extends Kernel {
             public function registerBundles(): iterable
             {
                 return [new FrameworkBundle(), new BlostBundle()];
@@ -34,7 +34,7 @@ final class SymfonyIntegrationTest extends TestCase
 
             public function getCacheDir(): string
             {
-                return sys_get_temp_dir().'/blost-symfony-tests-'.getmypid();
+                return sys_get_temp_dir() . '/blost-symfony-tests-' . getmypid();
             }
 
             public function getLogDir(): string
@@ -49,8 +49,15 @@ final class SymfonyIntegrationTest extends TestCase
             self::assertSame(200, $response->getStatusCode());
             self::assertSame('Symfony test', json_decode($response->getContent(), true)['name']);
             foreach (['First', 'Updated'] as $title) {
-                $response = $kernel->handle(Request::create('/blost/v1/articles/'.BlostApiTest::ID, 'PUT', [], [], [],
-                    ['HTTP_AUTHORIZATION' => 'Bearer secret', 'CONTENT_TYPE' => 'application/json'], json_encode(['title' => $title, 'content' => '<p>HTML</p>'])));
+                $response = $kernel->handle(Request::create(
+                    '/blost/v1/articles/' . BlostApiTest::ID,
+                    'PUT',
+                    [],
+                    [],
+                    [],
+                    ['HTTP_AUTHORIZATION' => 'Bearer secret', 'CONTENT_TYPE' => 'application/json'],
+                    json_encode(['title' => $title, 'content' => '<p>HTML</p>']),
+                ));
                 self::assertSame(200, $response->getStatusCode(), $response->getContent());
             }
             $publisher = $kernel->getContainer()->get(InMemoryPublisher::class);

@@ -19,10 +19,14 @@ final class RouteLoader extends Loader
     {
         $routes = new RouteCollection();
         if ($this->public) {
-            $prefix = '/'.trim($this->prefix, '/');
+            $prefix = '/' . trim($this->prefix, '/');
             $routes->add('blost_blog_index', new Route($prefix, ['_controller' => [BlogController::class, 'index']], methods: ['GET']));
-            $routes->add('blost_blog_show', new Route(rtrim($prefix, '/').'/{id}', ['_controller' => [BlogController::class, 'show']],
-                ['id' => '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'], methods: ['GET']));
+            $routes->add('blost_blog_show', new Route(
+                rtrim($prefix, '/') . '/{id}',
+                ['_controller' => [BlogController::class, 'show']],
+                ['id' => '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'],
+                methods: ['GET'],
+            ));
         }
 
         return $routes;

@@ -17,8 +17,7 @@ final class BlogController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly Environment $twig,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response
     {

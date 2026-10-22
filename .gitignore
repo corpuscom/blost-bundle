@@ -2,3 +2,4 @@
 /composer.lock
 /.phpunit.cache/
 /config/reference.php
+/.php-cs-fixer.cache

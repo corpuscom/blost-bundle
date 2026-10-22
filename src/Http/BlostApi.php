@@ -18,8 +18,7 @@ final class BlostApi
         private readonly ArticlePublisher $publisher,
         private readonly string $token,
         private readonly string $name = 'Blost connector',
-    ) {
-    }
+    ) {}
 
     public function status(Request $request): JsonResponse
     {
@@ -80,8 +79,17 @@ final class BlostApi
                 return $this->json(['error' => 'Invalid published_at timestamp.'], 422);
             }
         }
-        $article = new Article(strtolower($id), $data['title'], $data['content'], $data['excerpt'] ?? null,
-            $data['meta_title'] ?? null, $data['meta_description'] ?? null, $image, $data['language'] ?? null, $publishedAt);
+        $article = new Article(
+            strtolower($id),
+            $data['title'],
+            $data['content'],
+            $data['excerpt'] ?? null,
+            $data['meta_title'] ?? null,
+            $data['meta_description'] ?? null,
+            $image,
+            $data['language'] ?? null,
+            $publishedAt,
+        );
         // Let the framework report/log publisher exceptions as 5xx. Never acknowledge failed persistence.
         $result = $this->publisher->publish($article);
 

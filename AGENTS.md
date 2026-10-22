@@ -34,7 +34,7 @@ Inspect applicable instructions, the current branch, and the working-tree diff b
 ## Implementation rules
 
 - Maintain PHP 8.2-compatible source syntax and the constraints declared in Composer. Each framework version may require a newer PHP version.
-- Follow the existing namespaces, four-space indentation, and PHP style. Use strict types in source classes and explicit types where practical.
+- Follow PER Coding Style 3.0, enforced by PHP CS Fixer, and the existing namespaces. Run `composer cs-fix` to format PHP files and `composer cs-check` to check them. Use strict types in source classes and explicit types where practical.
 - Keep Laravel and Symfony FrameworkBundle optional runtime integrations. Do not introduce a mandatory dependency on either complete framework, Doctrine, or Eloquent for the shared API.
 - Keep DTOs immutable and the publisher interface independent of framework-specific request or model classes.
 - Read Laravel environment values through configuration so `config:cache` works. Preserve package discovery, config publishing, and serializable controller routes for `route:cache`.

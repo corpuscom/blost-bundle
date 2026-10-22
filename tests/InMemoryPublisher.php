@@ -17,6 +17,6 @@ final class InMemoryPublisher implements ArticlePublisher
     {
         $this->articles[$article->id] = $article;
 
-        return new PublishedArticle('https://example.com/articles/'.$article->id);
+        return new PublishedArticle('https://example.com/articles/' . $article->id);
     }
 }

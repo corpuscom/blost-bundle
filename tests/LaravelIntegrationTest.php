@@ -36,8 +36,15 @@ final class LaravelIntegrationTest extends TestCase
             self::assertSame(200, $response->getStatusCode());
             self::assertSame('Laravel test', json_decode($response->getContent(), true)['name']);
             foreach (['First', 'Updated'] as $title) {
-                $request = Request::create('/blost/v1/articles/'.BlostApiTest::ID, 'PUT', [], [], [],
-                    ['HTTP_AUTHORIZATION' => 'Bearer secret', 'CONTENT_TYPE' => 'application/json'], json_encode(['title' => $title, 'content' => '<p>HTML</p>']));
+                $request = Request::create(
+                    '/blost/v1/articles/' . BlostApiTest::ID,
+                    'PUT',
+                    [],
+                    [],
+                    [],
+                    ['HTTP_AUTHORIZATION' => 'Bearer secret', 'CONTENT_TYPE' => 'application/json'],
+                    json_encode(['title' => $title, 'content' => '<p>HTML</p>']),
+                );
                 $app->instance('request', $request);
                 $response = $router->dispatch($request);
                 self::assertSame(200, $response->getStatusCode(), $response->getContent());

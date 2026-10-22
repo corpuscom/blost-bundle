@@ -16,6 +16,5 @@ final readonly class Article
         public ?string $imageUrl,
         public ?string $language,
         public ?\DateTimeImmutable $publishedAt,
-    ) {
-    }
+    ) {}
 }

@@ -18,7 +18,8 @@
         "doctrine/doctrine-bundle": "^2.13 || ^3.0",
         "doctrine/orm": "^3.3",
         "doctrine/doctrine-migrations-bundle": "^3.4",
-        "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0"
+        "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0",
+        "friendsofphp/php-cs-fixer": "^3.95"
     },
     "suggest": {
         "symfony/framework-bundle": "Required for Symfony integration",
@@ -50,7 +51,10 @@
             "@composer validate --strict",
             "@composer validate --strict packages/laravel/composer.json",
             "@composer validate --strict packages/symfony/composer.json",
+            "@cs-check",
             "@test"
-        ]
+        ],
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix"
     }
 }

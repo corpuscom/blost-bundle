@@ -26,7 +26,7 @@ Symfony 6.4 and Laravel 12 require different major versions of HttpKernel and ca
 
 ## Making changes
 
-Keep changes focused and follow the existing PHP style: four-space indentation, existing namespaces, explicit types where practical, and strict types in source classes. Source syntax must remain compatible with PHP 8.2.
+Keep changes focused and follow [PER Coding Style 3.0](https://github.com/php-fig/per-coding-style/blob/3.0.0/spec.md). The versioned `@PER-CS3x0` rule set in [.php-cs-fixer.dist.php](.php-cs-fixer.dist.php) is required for PHP source, configuration, examples, migrations, tools, and tests across all three packages. Blade templates and generated files are excluded. Preserve existing namespaces, explicit types where practical, and strict types in source classes. Source syntax must remain compatible with PHP 8.2.
 
 Keep publishing behavior in the shared API. Framework adapters register services, configuration, and routes; they should not implement separate versions of authentication or validation. The host CMS owns persistence, public pages, SEO output, and media imports when using the base package. The optional `packages/laravel/` and `packages/symfony/` Composer packages provide default persistence and public pages without adding runtime dependencies to the base package. See the [package development guide](docs/packages.md).
 
@@ -36,6 +36,15 @@ When changing a payload or response, update the [protocol](docs/protocol.md), af
 
 For bug reports, include the package/framework/PHP versions, reproduction steps, expected and actual behavior, and relevant sanitized errors. Replace tokens and private article content with sample data.
 
+Format PHP changes with the development-only PHP CS Fixer dependency:
+
+```sh
+composer cs-fix
+composer cs-check
+```
+
+The first command applies the standard; the second reports violations without changing files. The versioned rule set keeps upgrades from silently selecting a newer PER revision.
+
 ## Validation
 
 Run the complete check before submitting code changes:
@@ -44,7 +53,7 @@ Run the complete check before submitting code changes:
 composer check
 ```
 
-This validates all three Composer manifests and runs PHPUnit, including SQLite database and public-page tests for both optional packages. Symfony tests generate and apply a real Doctrine migration. Laravel tests apply and reverse the supplied migration. The local PHP environment needs PDO SQLite. For focused iteration:
+This validates all three Composer manifests, checks PER coding style, and runs PHPUnit, including SQLite database and public-page tests for both optional packages. Symfony tests generate and apply a real Doctrine migration. Laravel tests apply and reverse the supplied migration. The local PHP environment needs PDO SQLite. For focused iteration:
 
 ```sh
 composer test -- --filter BlostApiTest
@@ -69,7 +78,7 @@ For documentation-only changes, check links, configuration names, examples, and 
 git diff --check
 ```
 
-Do not commit installed or generated files: `vendor/`, `composer.lock`, `.phpunit.cache/`, or `config/reference.php`.
+Do not commit installed or generated files: `vendor/`, `composer.lock`, `.phpunit.cache/`, `.php-cs-fixer.cache`, or `config/reference.php`.
 
 ## Commits and pull requests
 

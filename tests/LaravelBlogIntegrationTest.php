@@ -28,7 +28,7 @@ final class LaravelBlogIntegrationTest extends TestCase
         if (!class_exists(Application::class)) {
             self::markTestSkipped('Laravel is absent in the Symfony-only matrix.');
         }
-        $this->directory = sys_get_temp_dir().'/blost-laravel-blog-'.bin2hex(random_bytes(6));
+        $this->directory = sys_get_temp_dir() . '/blost-laravel-blog-' . bin2hex(random_bytes(6));
         mkdir($this->directory, 0777, true);
         $this->app = new Application($this->directory);
         $this->app->instance('config', new Repository([
@@ -49,7 +49,7 @@ final class LaravelBlogIntegrationTest extends TestCase
         $this->app->instance('request', Request::create('https://example.com'));
         $this->app['url']->forceRootUrl('https://example.com');
         $this->app['url']->forceScheme('https');
-        $this->migration = require __DIR__.'/../packages/laravel/database/migrations/2026_10_23_000000_create_blost_posts_table.php';
+        $this->migration = require __DIR__ . '/../packages/laravel/database/migrations/2026_10_23_000000_create_blost_posts_table.php';
         $this->migration->up();
     }
 
@@ -79,12 +79,12 @@ final class LaravelBlogIntegrationTest extends TestCase
             'language' => 'Hungarian', 'published_at' => '2020-01-01T12:00:00+02:00'];
         $response = $this->publish($payload);
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame('https://example.com/news/'.BlostApiTest::ID, json_decode($response->getContent(), true)['url']);
+        self::assertSame('https://example.com/news/' . BlostApiTest::ID, json_decode($response->getContent(), true)['url']);
         $post = Post::query()->findOrFail(BlostApiTest::ID);
         self::assertSame('2020-01-01 10:00:00', $post->published_at->format('Y-m-d H:i:s'));
         self::assertSame('UTC', $post->published_at->timezoneName);
         self::assertSame('Hungarian', $post->language);
-        $html = $this->request('/news/'.BlostApiTest::ID)->getContent();
+        $html = $this->request('/news/' . BlostApiTest::ID)->getContent();
         self::assertStringContainsString('<h2>Editorial HTML</h2>', $html);
         self::assertStringContainsString('&lt;Title&gt;', $html);
         self::assertStringContainsString('SEO &amp; title', $html);
@@ -103,7 +103,7 @@ final class LaravelBlogIntegrationTest extends TestCase
         self::assertNotEmpty(ServiceProvider::pathsToPublish(BlostBlogServiceProvider::class, 'blost-blog-migrations'));
         // Exercise the compiled route collection used by route:cache.
         $this->app['router']->setCompiledRoutes($this->app['router']->getRoutes()->compile());
-        self::assertSame(200, $this->request('/news/'.BlostApiTest::ID)->getStatusCode());
+        self::assertSame(200, $this->request('/news/' . BlostApiTest::ID)->getStatusCode());
         self::assertSame(200, $this->publish(['title' => 'Cached routes', 'content' => 'Body'])->getStatusCode());
         $this->migration->down();
         self::assertFalse($this->app['db']->connection()->getSchemaBuilder()->hasTable('blost_posts'));
@@ -112,7 +112,7 @@ final class LaravelBlogIntegrationTest extends TestCase
     public function testListingPaginatesWithoutRepeatingArticles(): void
     {
         for ($i = 0; $i < 21; ++$i) {
-            Post::query()->create(['id' => sprintf('00000000-0000-0000-0000-%012d', $i), 'title' => 'Post '.$i, 'content' => 'Body', 'published_at' => '2020-01-01 00:00:00']);
+            Post::query()->create(['id' => sprintf('00000000-0000-0000-0000-%012d', $i), 'title' => 'Post ' . $i, 'content' => 'Body', 'published_at' => '2020-01-01 00:00:00']);
         }
         $first = $this->request('/news')->getContent();
         self::assertSame(20, substr_count($first, '<article>'));
@@ -129,7 +129,7 @@ final class LaravelBlogIntegrationTest extends TestCase
         $this->publish(['title' => 'Future article', 'content' => 'Later', 'published_at' => '2099-01-01T00:00:00Z']);
         self::assertStringNotContainsString('Future article', $this->request('/news')->getContent());
         $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
-        $this->request('/news/'.BlostApiTest::ID);
+        $this->request('/news/' . BlostApiTest::ID);
     }
 
     public function testNullPublicationDateDefaultsAndSurvivesRetry(): void
@@ -170,7 +170,7 @@ final class LaravelBlogIntegrationTest extends TestCase
 
     private function request(string $path, array $server = []): \Symfony\Component\HttpFoundation\Response
     {
-        $request = Request::create('https://example.com'.$path, 'GET', [], [], [], $server);
+        $request = Request::create('https://example.com' . $path, 'GET', [], [], [], $server);
         $this->app->instance('request', $request);
 
         return $this->app['router']->dispatch($request);
@@ -178,8 +178,15 @@ final class LaravelBlogIntegrationTest extends TestCase
 
     private function publish(array $payload, bool $authorized = true): \Symfony\Component\HttpFoundation\Response
     {
-        $request = Request::create('https://example.com/blost/v1/articles/'.BlostApiTest::ID, 'PUT', [], [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => $authorized ? 'Bearer secret' : ''], json_encode($payload));
+        $request = Request::create(
+            'https://example.com/blost/v1/articles/' . BlostApiTest::ID,
+            'PUT',
+            [],
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => $authorized ? 'Bearer secret' : ''],
+            json_encode($payload),
+        );
         $this->app->instance('request', $request);
 
         return $this->app['router']->dispatch($request);
