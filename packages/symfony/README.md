@@ -4,13 +4,15 @@ A ready-to-use blog for Symfony 6.4, 7, or 8, built on [the shared Blost publish
 
 ## Install
 
-This optional package is not yet separately published on Packagist. For now, clone the monorepo next to your application, then run the Composer commands from your application directory:
+Install from [Packagist](https://packagist.org/packages/corpuscom/blost-symfony) in your application directory. Until tagged releases are available, require both the integration and its shared dependency explicitly at `dev-main`:
 
 ```sh
-git clone https://github.com/corpuscom/blost-bundle.git ../blost-bundle
-composer config repositories.blost-symfony '{"type":"path","url":"../blost-bundle/packages/symfony","options":{"versions":{"corpuscom/blost-symfony":"dev-main"}}}'
 composer require corpuscom/blost-symfony:dev-main corpuscom/blost-bundle:dev-main
 ```
+
+No repository clone, custom Composer repository, or project-wide `minimum-stability` change is needed. The explicit shared dependency allows Composer to install its development version while keeping your application's normal stability policy.
+
+If you used the previous local checkout instructions, remove that path repository with `composer config --unset repositories.blost-symfony` before running the installation command.
 
 Ensure these bundles are registered in `config/bundles.php`; Symfony Flex may already register the Doctrine and Twig bundles:
 

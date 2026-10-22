@@ -4,13 +4,15 @@ A ready-to-use blog for Laravel 12 or 13, built on [the shared Blost publishing 
 
 ## Install
 
-This optional package is not yet separately published on Packagist. For now, clone the monorepo next to your application, then run the Composer commands from your application directory:
+Install from [Packagist](https://packagist.org/packages/corpuscom/blost-laravel) in your application directory. Until tagged releases are available, require both the integration and its shared dependency explicitly at `dev-main`:
 
 ```sh
-git clone https://github.com/corpuscom/blost-bundle.git ../blost-bundle
-composer config repositories.blost-laravel '{"type":"path","url":"../blost-bundle/packages/laravel","options":{"versions":{"corpuscom/blost-laravel":"dev-main"}}}'
 composer require corpuscom/blost-laravel:dev-main corpuscom/blost-bundle:dev-main
 ```
+
+No repository clone, custom Composer repository, or project-wide `minimum-stability` change is needed. The explicit shared dependency allows Composer to install its development version while keeping your application's normal stability policy.
+
+If you used the previous local checkout instructions, remove that path repository with `composer config --unset repositories.blost-laravel` before running the installation command.
 
 Composer discovers both providers automatically. No application model, controller, or publisher implementation is required. The model is `Corpuscom\Blost\LaravelBlog\Post`, backed by `blost_posts` on your default database connection. If you already set `blost.publisher`, that implementation takes precedence; remove that setting or set it to null to use the supplied publisher.
 

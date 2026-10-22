@@ -4,11 +4,11 @@ The repository contains three Composer packages:
 
 | Package | Purpose | Location |
 | --- | --- | --- |
-| `corpuscom/blost-bundle` | Shared publishing API and lightweight framework adapters for an existing CMS. | Repository root |
-| `corpuscom/blost-laravel` | Eloquent storage, publishable migration, publisher, and Blade blog pages. | [Laravel](../packages/laravel/README.md) |
-| `corpuscom/blost-symfony` | Doctrine entity and mapping, publisher, migration generation, and Twig blog pages. | [Symfony](../packages/symfony/README.md) |
+| [corpuscom/blost-bundle](https://packagist.org/packages/corpuscom/blost-bundle) | Shared publishing API and lightweight framework adapters for an existing CMS. | Repository root |
+| [corpuscom/blost-laravel](https://packagist.org/packages/corpuscom/blost-laravel) | Eloquent storage, publishable migration, publisher, and Blade blog pages. | [Laravel](../packages/laravel/README.md) |
+| [corpuscom/blost-symfony](https://packagist.org/packages/corpuscom/blost-symfony) | Doctrine entity and mapping, publisher, migration generation, and Twig blog pages. | [Symfony](../packages/symfony/README.md) |
 
-The base package remains available on Packagist as `dev-main`. The two optional packages have not been published separately yet. Their guides show local Composer path installation from a checkout, without relaxing project-wide stability. After separate publication, a host can require its framework package and the base development dependency explicitly until stable releases exist.
+All three packages are published on Packagist. Currently only `dev-main` is available; there are no tagged releases. Install your chosen framework integration with its shared `corpuscom/blost-bundle:dev-main` dependency explicitly, as shown in the [Laravel guide](../packages/laravel/README.md#install) or [Symfony guide](../packages/symfony/README.md#install). No repository clone, custom Composer repository, or project-wide `minimum-stability` change is needed.
 
 Each optional package depends on the base package. Authentication, payload validation, and the wire protocol have one implementation. Host applications using an existing CMS can keep their current publisher and avoid installing either optional package.
 
@@ -30,7 +30,7 @@ Run `composer install` at the repository root. The development autoloader includ
 
 The root manifest's runtime dependencies and discovery remain unchanged. Framework-specific runtime dependencies and Laravel provider discovery are declared in each optional package's own manifest. The independent installation check uses temporary consumers with path repositories, which catches missing package autoload/dependency declarations without relying on the root development autoloader.
 
-Composer cannot install a package directly from a GitHub repository subdirectory. The distribution repositories are [corpuscom/blost-laravel](https://github.com/corpuscom/blost-laravel) and [corpuscom/blost-symfony](https://github.com/corpuscom/blost-symfony); each has its Composer manifest at the root and can be submitted to Packagist.
+Composer cannot install a package directly from a GitHub repository subdirectory. The distribution repositories are [corpuscom/blost-laravel](https://github.com/corpuscom/blost-laravel) and [corpuscom/blost-symfony](https://github.com/corpuscom/blost-symfony); each has its Composer manifest at the root and is registered on Packagist.
 
 ### Automatic synchronization
 
@@ -42,12 +42,12 @@ Each destination repository has its own write-enabled SSH deploy key. The matchi
 
 | Destination | Source repository secret |
 | --- | --- |
-| `corpuscom/blost-laravel` | `BLOST_LARAVEL_DEPLOY_KEY` |
-| `corpuscom/blost-symfony` | `BLOST_SYMFONY_DEPLOY_KEY` |
+| [corpuscom/blost-laravel](https://github.com/corpuscom/blost-laravel) | `BLOST_LARAVEL_DEPLOY_KEY` |
+| [corpuscom/blost-symfony](https://github.com/corpuscom/blost-symfony) | `BLOST_SYMFONY_DEPLOY_KEY` |
 
 To rotate a key, generate a new Ed25519 key pair, add its public key as a write-enabled deploy key on the matching destination, replace the source repository's matching secret with the private key, run the workflow manually, then remove the old destination deploy key. Never commit private keys. The workflow uses a pinned GitHub SSH host key; if GitHub rotates it, verify the replacement through GitHub's official documentation/API before updating the workflow.
 
-Shared bundle changes do not need copying into the distribution repositories: both packages depend on `corpuscom/blost-bundle` through Composer. Packagist registrations and webhook/update configuration remain separate from repository synchronization.
+Shared bundle changes do not need copying into the distribution repositories: both packages depend on `corpuscom/blost-bundle` through Composer. Packagist webhook/update configuration remains separate from repository synchronization.
 
 For a local inspection without publishing:
 
@@ -56,4 +56,4 @@ git subtree split --prefix=packages/laravel --branch=split/laravel
 git subtree split --prefix=packages/symfony --branch=split/symfony
 ```
 
-Each split contains its own manifest, source, templates, usage guide, and license. Keep the base `dev-main` dependency explicit until compatible stable tags exist. Release tags and Packagist publication remain maintainer actions.
+Each split contains its own manifest, source, templates, usage guide, and license. Keep the base `dev-main` dependency explicit until compatible stable tags exist. Release tags remain maintainer actions; repository synchronization does not create stable releases.
