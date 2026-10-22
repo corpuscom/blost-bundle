@@ -76,6 +76,18 @@ For Codex (GPT-6) contributions, use the confirmed identity:
 Co-authored-by: Codex (GPT-6) <codex@openai.com>
 ```
 
+For Claude contributions, use the confirmed email address and include the actual model/version when known:
+
+```text
+Co-authored-by: Claude (Model/version) <noreply@anthropic.com>
+```
+
+Replace `Model/version` with the contributing Claude model/version. If it is unavailable, omit the parenthetical:
+
+```text
+Co-authored-by: Claude <noreply@anthropic.com>
+```
+
 For an agent without a valid email address, use this template with its actual name and known model/version:
 
 ```text
