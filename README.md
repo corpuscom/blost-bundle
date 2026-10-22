@@ -1,29 +1,127 @@
 # Blost integration for Symfony and Laravel
 
-One Composer package receives articles from [Blost](https://github.com/corpuscom/blost) through a native, versioned API. It includes a Symfony bundle and a Laravel service provider with automatic package discovery. Both use the same authentication, validation, and publishing contract.
+Receive articles from [Blost](https://github.com/corpuscom/blost) in your existing Symfony or Laravel application. One Composer package provides a Symfony bundle and a Laravel service provider with the same authenticated publishing API.
 
-Requires PHP 8.2+, Symfony 6.4/7/8 or Laravel 12/13. Framework dependencies are optional at runtime: installing in Laravel does not install Symfony FrameworkBundle, and installing in Symfony does not install Laravel.
+The package handles authentication, validation, and delivery to your publisher. Your application saves articles into its own CMS and supplies the public pages, media handling, and SEO rendering.
 
-## Install
+## Requirements
+
+- PHP 8.2 or later, subject to your framework's PHP requirements.
+- Symfony 6.4, 7, or 8; or Laravel 12 or 13.
+- A public HTTPS URL for your application, on port 443, reachable from Blost.
+
+Framework dependencies are optional: installing in Laravel does not install Symfony FrameworkBundle, and installing in Symfony does not install Laravel.
+
+## 1. Install from Packagist
+
+The package is available on [Packagist](https://packagist.org/packages/corpuscom/blost-bundle). Until a tagged release is available, install the `main` development branch explicitly:
 
 ```sh
-composer require corpuscom/blost-bundle
+composer require corpuscom/blost-bundle:dev-main
+```
+
+No custom Composer repository or project-wide `minimum-stability` change is needed. Once tagged releases are available, use `composer require corpuscom/blost-bundle` for a stable release.
+
+Generate a token:
+
+```sh
 php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'
 ```
 
-The package must first be published to a Composer repository. Before publication, add this checkout as a Composer `path` repository and require `corpuscom/blost-bundle:@dev`.
+Add the generated value to your application's environment configuration:
 
-Put the generated token in your application's environment as `BLOST_TOKEN`. Use a different token for each installation. An empty token denies every request.
+```dotenv
+BLOST_TOKEN=replace_with_the_generated_token
+```
 
-## Symfony
+Use a different token for each installation. An empty token denies every request. Keep the token on the server and enter the same value in Blost when connecting.
 
-Register the bundle in `config/bundles.php`:
+## 2. Implement your article publisher
+
+Create `App\Blost\ArticlePublisher` implementing `Corpuscom\Blost\Contract\ArticlePublisher`. The package calls this method whenever Blost publishes or updates an article:
+
+```php
+public function publish(\Corpuscom\Blost\Article $article): \Corpuscom\Blost\PublishedArticle;
+```
+
+Start with the adapter for your application's persistence layer:
+
+- [Laravel / Eloquent example](examples/Laravel/ArticlePublisher.php).
+- [Symfony / Doctrine ORM example](examples/Symfony/ArticlePublisher.php).
+
+The examples assume your own `BlogPost` model/entity and public article route. Adapt their field names and route names to your CMS before registering the publisher. Doctrine is only needed if you use the Doctrine example.
+
+Use `$article->id` as the external identity and enforce a **unique database index** on that field. For example, an Eloquent migration for an existing `blog_posts` table can add it with:
+
+```php
+Schema::table('blog_posts', function (Blueprint $table) {
+    $table->uuid('blost_id')->nullable()->unique();
+});
+```
+
+Import `Illuminate\Support\Facades\Schema` and `Illuminate\Database\Schema\Blueprint` in that migration. Add the remaining fields required by your model or map them to existing CMS columns.
+
+Save these values from the incoming `Article`:
+
+| Property | Usage |
+| --- | --- |
+| `id` | Stable Blost UUID; atomically create or update the matching article. |
+| `title` | Article title. |
+| `content` | Full editorial HTML, including headings, links, and optional structured data. |
+| `excerpt` | Optional short description. |
+| `metaTitle` | Optional SEO title. |
+| `metaDescription` | Optional SEO description. |
+| `imageUrl` | Optional HTTP(S) image URL; import through your media pipeline or store the URL. |
+| `language` | Optional Blost language label, such as `Hungarian`; not necessarily an ISO code. |
+| `publishedAt` | Optional `DateTimeImmutable` publication timestamp. |
+
+Optional null metadata clears the stored value. For a null publication timestamp, preserve the existing first publication date or use the current time for a new article.
+
+Return `new PublishedArticle($publicUrl)` only after durable persistence, using the article's real absolute HTTP(S) URL. Throw on storage failure so Blost receives a 5xx and can retry. Handle concurrent creates with an upsert or unique-conflict retry: a transaction alone does not prevent duplicate records.
+
+Preserve the HTML according to your CMS's editorial content policy. The package passes image URLs to your adapter without downloading them; apply your existing destination validation and download limits if importing images. Scope writes to the intended blog or tenant in your adapter.
+
+## 3. Register with your framework
+
+### Laravel
+
+The service provider is discovered automatically. Publish the configuration:
+
+```sh
+php artisan vendor:publish --tag=blost-config
+```
+
+In `config/blost.php`, set your publisher class:
+
+```php
+return [
+    'token' => env('BLOST_TOKEN', ''),
+    'name' => env('APP_NAME', 'Blost connector'),
+    'publisher' => App\Blost\ArticlePublisher::class,
+];
+```
+
+Confirm that the routes are registered:
+
+```sh
+php artisan route:list --path=blost/v1
+```
+
+The provider registers stateless routes outside the `web` middleware group; they authenticate with the bearer token. The routes support `route:cache`. If you cache configuration in production, rebuild it after changing the token or publisher:
+
+```sh
+php artisan config:cache
+```
+
+### Symfony
+
+Add the bundle entry to the array in `config/bundles.php`:
 
 ```php
 Corpuscom\Blost\Symfony\BlostBundle::class => ['all' => true],
 ```
 
-Configure `config/packages/blost.yaml`:
+Create `config/packages/blost.yaml`:
 
 ```yaml
 blost:
@@ -32,7 +130,7 @@ blost:
     publisher: App\Blost\ArticlePublisher
 ```
 
-Import the package routes in `config/routes/blost.yaml`:
+Create `config/routes/blost.yaml`:
 
 ```yaml
 blost:
@@ -40,60 +138,77 @@ blost:
     type: php
 ```
 
-Register your publisher as a service (the usual `App\` service discovery handles this). If your security firewall requires a login, place `- { path: ^/blost/v1/, roles: PUBLIC_ACCESS }` before the catch-all access rule and make sure a firewall authenticator does not reject these requests first. The package itself authenticates every request using the token.
+Register your publisher as a service. Standard `App\` service discovery covers it when the class lives in `src/Blost/ArticlePublisher.php`.
 
-See `examples/Symfony/ArticlePublisher.php` for a Doctrine ORM adapter.
+If your firewall requires a login, add the following rule before the catch-all entry in `security.access_control`:
 
-## Laravel
+```yaml
+- { path: ^/blost/v1/, roles: PUBLIC_ACCESS }
+```
 
-The provider is discovered automatically. Publish its config:
+Ensure your firewall's authenticators allow these requests to reach the controller. The package verifies the bearer token itself.
+
+Check the routes and rebuild the production cache after deployment:
 
 ```sh
-php artisan vendor:publish --tag=blost-config
+php bin/console debug:router blost_status
+php bin/console debug:router blost_publish
+php bin/console cache:clear --env=prod
 ```
 
-Set `publisher` in `config/blost.php` to your implementation:
+## 4. Connect your application in Blost
 
-```php
-'publisher' => App\Blost\ArticlePublisher::class,
+Use a Blost deployment that includes the native Symfony / Laravel connector. Open **Settings → CMS connection → Symfony / Laravel** and enter:
+
+- **Connector URL:** `https://your-site.example/blost/v1`. Include any application subdirectory, for example `https://your-site.example/app/blost/v1`.
+- **Token:** the same value as your application's `BLOST_TOKEN`.
+
+Choose **Test connection**, then **Save connection**. Blost encrypts the token at rest and does not return it to the browser. Leave the token blank on later saves to keep the saved value.
+
+Publish a test article, edit it, and republish. Confirm that your CMS contains one article with the updated content and that its public page shows the expected image and SEO metadata. Then verify scheduled delivery before enabling unattended publishing.
+
+Manual publishing, edits, scheduled publishing, and auto-publishing use the same article UUID. Drafts waiting for approval remain in Blost until published. If a request times out or Blost cannot record a successful delivery, retrying updates the same CMS article.
+
+## Verify the API directly
+
+With `BLOST_TOKEN` exported in your shell, test your deployed connector:
+
+```sh
+curl --fail-with-body \
+  --header "Authorization: Bearer $BLOST_TOKEN" \
+  https://your-site.example/blost/v1/status
 ```
 
-The provider registers stateless routes outside the `web` middleware group. They use bearer authentication and support `route:cache` and `config:cache`. Read the environment only through config. After changing config or the token, rebuild your production config cache.
+Loading a `.env` file in PHP does not automatically export its values into your terminal. Set the shell variable separately before running the command.
 
-See `examples/Laravel/ArticlePublisher.php` for an Eloquent adapter.
+A successful connection returns HTTP 200 with the configured name:
 
-## Connect in Blost
-
-Deploy the accompanying Blost feature branch, then open **Settings → CMS connection → Symfony / Laravel**. Enter:
-
-- Connector URL: `https://your-site.example/blost/v1` (include a subdirectory if the app is installed under one).
-- Token: the same value as `BLOST_TOKEN`.
-
-Test and save the connection. Blost encrypts the token at rest and never returns it to the browser. Manual publishing, edits to published articles, scheduled publishing, and auto-publishing use the same article UUID. No Blost database migration is required. Drafts waiting for approval remain in Blost until published.
-
-## Save articles in your application
-
-Implement `Corpuscom\Blost\Contract\ArticlePublisher`:
-
-```php
-public function publish(\Corpuscom\Blost\Article $article): \Corpuscom\Blost\PublishedArticle;
+```json
+{"protocol_version":"1","name":"My website"}
 ```
 
-Your adapter must atomically upsert using `$article->id`, enforced by a **unique database index**. A UUID identifies the same article across requests, including retries after a timeout or a Blost bookkeeping failure. Do not insert a new record for every request. Handle concurrent creates with an upsert or a unique-conflict retry; a transaction alone does not prevent duplicate creation.
+Publishing uses `PUT /blost/v1/articles/{uuid}` with a JSON payload. See [the API contract](docs/protocol.md) for request examples, response fields, and limits.
 
-Map the title, full HTML body, excerpt, SEO title/description, image URL, language, and publication date to your application's own fields. Optional null metadata clears the stored value. A null publication date means use the existing first publication date, or the current time for a new article. Return the article's real public HTTP(S) URL only after saving successfully; throw on storage failure so Blost receives a 5xx and can retry.
+## Troubleshooting
 
-The package preserves editorial HTML, including headings, links, and structured data. Apply your CMS's existing content policy when saving and rendering it. Image URLs are passed to your adapter without fetching remote resources. You can store the URL or import the image through your application's existing media pipeline; validate destinations and bound downloads if importing. Scope writes to this installation's designated blog/tenant; never infer a tenant from arbitrary payload fields.
-
-The package supplies the publishing bridge. Your application supplies persistence, public pages, media handling, and SEO rendering using its existing CMS.
-
-See [the API contract](docs/protocol.md) for payloads, limits, and deployment checks.
+| Symptom | Check |
+| --- | --- |
+| Composer cannot find a stable version | Install `corpuscom/blost-bundle:dev-main` until a tagged release is available. |
+| HTTP 401 | Match the token in Blost and the receiving application; refresh cached configuration and ensure your proxy forwards `Authorization` to PHP. |
+| HTTP 404 | Register the framework routes and include any application subdirectory in the connector URL. |
+| Login page or redirect instead of JSON | Allow the connector routes through your application firewall and use their final HTTPS URL. Blost does not follow redirects. |
+| HTTP 413 | Requests are limited to 2 MiB. Set proxy/PHP limits to at least that value. |
+| HTTP 422 | Check the UUID and payload types. Image data URIs are unsupported; provide an HTTP(S) image URL. |
+| HTTP 5xx | Check the publisher configuration and application logs for storage or mapping errors. |
+| Connection fails for a local address | Blost requires a public HTTPS endpoint. Use a public HTTPS tunnel for local development. |
 
 ## Development
+
+Clone the repository, then run:
 
 ```sh
 composer install
 composer check
 ```
 
-Tests boot a Symfony kernel and a Laravel application/router, exercise both adapters, and verify authentication, payload rejection, rich-content preservation, and repeated updates. CI covers Symfony 6.4 alone, Symfony 7/Laravel 12, and Symfony 8/Laravel 13. Symfony 6.4 and Laravel 12 require different major versions of HttpKernel, so they are tested in separate dependency environments.
+Tests boot a Symfony kernel and a Laravel application/router, exercising authentication, validation, HTML preservation, and repeated updates. CI covers Symfony 6.4 alone, Symfony 7/Laravel 12, and Symfony 8/Laravel 13. Symfony 6.4 and Laravel 12 require different major versions of HttpKernel, so they are tested in separate dependency environments.
