@@ -15,6 +15,9 @@ jobs:
           - php: '8.4'
             symfony: '^8.0'
             laravel: '^13.0'
+          - php: '8.5'
+            symfony: '^8.0'
+            laravel: '^13.0'
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2

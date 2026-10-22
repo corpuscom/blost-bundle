@@ -20,6 +20,7 @@ Use your fork's clone URL if you do not have write access. PHP 8.2 is the packag
 | 8.2 | 6.4 | Not installed |
 | 8.3 | 7 | 12 |
 | 8.4 | 8 | 13 |
+| 8.5 | 8 | 13 |
 
 Symfony 6.4 and Laravel 12 require different major versions of HttpKernel and cannot be tested in the same dependency environment. Use separate checkouts or temporary directories when changing dependency constraints to reproduce a CI job. Keep those temporary constraints out of your patch.
 
