@@ -110,4 +110,6 @@ Separate trailers from the body with a blank line. Preserve existing human trail
 
 Open a pull request against `main`. Explain the problem, resulting behavior, and checks actually run. Include any compatibility or deployment implications. Do not include unrelated refactoring or generated files. Changes to one framework must retain compatibility with the other.
 
+Branch protection restricts updates to the monorepo's `main` to the `corpuscom` teams `Corpus` and `Lector`; GitHub also permits repository administrators, including organization owners, to push. New organization members need membership in one of those teams or repository administration access to push directly. The separate Laravel and Symfony repositories are distribution mirrors; submit their changes here.
+
 Maintainers manage merges, release tags, and publication. Adding a dependency or changing supported versions should include the reason and corresponding CI/documentation changes.

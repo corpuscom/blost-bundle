@@ -1,5 +1,9 @@
 # Blost for Laravel
 
+> [!IMPORTANT]
+> **Distribution mirror — submit changes to [corpuscom/blost-bundle](https://github.com/corpuscom/blost-bundle).**
+> This repository is updated automatically. Direct changes to `main` are restricted to the sync automation.
+
 A ready-to-use blog for Laravel 12 or 13, built on [the shared Blost publishing API](https://github.com/corpuscom/blost-bundle). It includes an Eloquent model, a publishable migration, the article publisher, and public Blade pages. PHP must meet your Laravel version's requirements.
 
 ## Install

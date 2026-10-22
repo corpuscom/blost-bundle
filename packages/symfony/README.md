@@ -1,5 +1,9 @@
 # Blost for Symfony
 
+> [!IMPORTANT]
+> **Distribution mirror — submit changes to [corpuscom/blost-bundle](https://github.com/corpuscom/blost-bundle).**
+> This repository is updated automatically. Direct changes to `main` are restricted to the sync automation.
+
 A ready-to-use blog for Symfony 6.4, 7, or 8, built on [the shared Blost publishing API](https://github.com/corpuscom/blost-bundle). It includes a mapped Doctrine entity, publisher, public routes, and Twig pages. PHP must meet the selected Symfony and Doctrine versions' requirements; the package source supports PHP 8.2.
 
 ## Install
