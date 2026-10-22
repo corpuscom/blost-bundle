@@ -65,13 +65,26 @@ Do not commit installed or generated files: `vendor/`, `composer.lock`, `.phpuni
 
 Use a concise emoji-prefixed imperative commit subject, such as `🐛 Preserve publication dates on retries`. Add a body when it helps explain the reason for a change.
 
-Credit AI contributions using a `Co-authored-by` trailer with the contributing agent's actual identity and known model/version. For Codex (GPT-6) contributions, use:
+Credit every contributing AI agent using its actual identity. Choose the trailer according to whether the agent has an available, valid email address:
+
+- **Valid email available:** use `Co-authored-by: Agent (Model/version) <email>`. This applies to Codex, Claude, and any other agent with a valid email address.
+- **No valid email available:** use `Assisted-by: Agent (Model/version)` without an email address.
+
+For Codex (GPT-6) contributions, use the confirmed identity:
 
 ```text
 Co-authored-by: Codex (GPT-6) <codex@openai.com>
 ```
 
-Separate trailers from the body with a blank line. Do not use this identity for another agent or invent an email address. Preserve existing human trailers when amending a commit, and verify the final message after local hooks run.
+For an agent without a valid email address, use this template with its actual name and known model/version:
+
+```text
+Assisted-by: Agent (Model/version)
+```
+
+Omit the model/version parenthetical when it is unavailable. Never invent an email address or use another agent's identity. If several agents contributed, include a separate trailer for each using the appropriate format.
+
+Separate trailers from the body with a blank line. Preserve existing human trailers when amending a commit, and verify the final message after local hooks run.
 
 Open a pull request against `main`. Explain the problem, resulting behavior, and checks actually run. Include any compatibility or deployment implications. Do not include unrelated refactoring or generated files. Changes to one framework must retain compatibility with the other.
 

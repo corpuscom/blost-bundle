@@ -72,5 +72,6 @@ Use isolated environments for incompatible framework dependency combinations. Do
 
 - Follow the user's requested branch and publication scope. `main` is the repository's default branch. Push only when authorized; never force-push shared history without authorization.
 - Follow the [commit and PR conventions](CONTRIBUTION.md#commits-and-pull-requests). Inspect the actual diff before committing and verify the message after hooks run.
-- Use the specified `Co-authored-by` trailer for Codex (GPT-6) contributions; do not substitute `Assisted-by` or copy that identity for another agent. Preserve existing human trailers.
+- Every contributing agent with an available, valid email address must use `Co-authored-by: Agent (Model/version) <email>`. Every other contributing agent must use `Assisted-by: Agent (Model/version)` without an email address.
+- Use the actual contributing agent and known model/version; omit the parenthetical when the model/version is unavailable. Never invent an identity or email address, or copy another agent's attribution. Follow the examples in the contribution guide and preserve existing human trailers.
 - Report what changed, the checks actually run, and any unresolved validation limits. Never describe a configured CI matrix as having passed locally unless it was executed.
