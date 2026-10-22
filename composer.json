@@ -14,7 +14,11 @@
         "illuminate/support": "^12.0 || ^13.0",
         "illuminate/routing": "^12.0 || ^13.0",
         "illuminate/config": "^12.0 || ^13.0",
-        "laravel/framework": "^12.0 || ^13.0"
+        "laravel/framework": "^12.0 || ^13.0",
+        "doctrine/doctrine-bundle": "^2.13 || ^3.0",
+        "doctrine/orm": "^3.3",
+        "doctrine/doctrine-migrations-bundle": "^3.4",
+        "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0"
     },
     "suggest": {
         "symfony/framework-bundle": "Required for Symfony integration",
@@ -28,7 +32,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Corpuscom\\Blost\\Tests\\": "tests/"
+            "Corpuscom\\Blost\\Tests\\": "tests/",
+            "Corpuscom\\Blost\\LaravelBlog\\": "packages/laravel/src/",
+            "Corpuscom\\Blost\\SymfonyBlog\\": "packages/symfony/src/"
         }
     },
     "extra": {
@@ -42,6 +48,8 @@
         "test": "phpunit",
         "check": [
             "@composer validate --strict",
+            "@composer validate --strict packages/laravel/composer.json",
+            "@composer validate --strict packages/symfony/composer.json",
             "@test"
         ]
     }

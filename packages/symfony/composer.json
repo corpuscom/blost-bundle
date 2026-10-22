@@ -1,0 +1,21 @@
+{
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Corpuscom\\Blost\\SymfonyBlog\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "corpuscom/blost-bundle": "^1.0 || dev-main",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+        "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0",
+        "doctrine/doctrine-bundle": "^2.13 || ^3.0",
+        "doctrine/orm": "^3.3",
+        "doctrine/doctrine-migrations-bundle": "^3.4",
+        "doctrine/dbal": "^4.0"
+    },
+    "name": "corpuscom/blost-symfony",
+    "description": "Ready-to-use Blost blog for Symfony"
+}

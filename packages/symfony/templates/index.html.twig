@@ -1,0 +1,16 @@
+{% extends '@BlostBlog/layout.html.twig' %}
+{% block content %}
+    <h1>{{ blost_blog_title }}</h1>
+    {% for post in posts %}
+        <article>
+            <h2><a href="{{ path('blost_blog_show', {id: post.id}) }}">{{ post.title }}</a></h2>
+            {% if post.excerpt %}<p>{{ post.excerpt }}</p>{% endif %}
+        </article>
+    {% else %}
+        <p>No articles yet.</p>
+    {% endfor %}
+    <nav aria-label="Pagination">
+        {% if page > 1 %}<a href="{{ path('blost_blog_index', {page: page - 1}) }}">Previous</a>{% endif %}
+        {% if has_next %}<a href="{{ path('blost_blog_index', {page: page + 1}) }}">Next</a>{% endif %}
+    </nav>
+{% endblock %}

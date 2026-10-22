@@ -1,0 +1,27 @@
+{
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Corpuscom\\Blost\\LaravelBlog\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "corpuscom/blost-bundle": "^1.0 || dev-main",
+        "illuminate/database": "^12.0 || ^13.0",
+        "illuminate/routing": "^12.0 || ^13.0",
+        "illuminate/support": "^12.0 || ^13.0",
+        "illuminate/view": "^12.0 || ^13.0",
+        "illuminate/pagination": "^12.0 || ^13.0"
+    },
+    "name": "corpuscom/blost-laravel",
+    "description": "Ready-to-use Blost blog for Laravel",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Corpuscom\\Blost\\LaravelBlog\\BlostBlogServiceProvider"
+            ]
+        }
+    }
+}

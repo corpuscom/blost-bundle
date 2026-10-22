@@ -2,7 +2,9 @@
 
 Receive articles from [Blost](https://blost.ai) in your existing Symfony or Laravel application. One Composer package provides a Symfony bundle and a Laravel service provider with the same authenticated publishing API.
 
-The package handles authentication, validation, and delivery to your publisher. Your application saves articles into its own CMS and supplies the public pages, media handling, and SEO rendering.
+For a ready-to-use blog with database storage and public pages, choose the optional [Laravel integration](packages/laravel/README.md) or [Symfony integration](packages/symfony/README.md). These packages provide the publisher for you. They live in this repository as separate Composer packages; their publication is tracked in the [package guide](docs/packages.md).
+
+The base package handles authentication, validation, and delivery to your publisher. Your application saves articles into its own CMS and supplies the public pages, media handling, and SEO rendering.
 
 [Installation](#1-install-from-packagist) · [Publisher](#2-implement-your-article-publisher) · [Laravel](#laravel) · [Symfony](#symfony) · [Connect in Blost](#4-connect-your-application-in-blost) · [Troubleshooting](#troubleshooting)
 

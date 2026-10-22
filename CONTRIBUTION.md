@@ -28,7 +28,7 @@ Symfony 6.4 and Laravel 12 require different major versions of HttpKernel and ca
 
 Keep changes focused and follow the existing PHP style: four-space indentation, existing namespaces, explicit types where practical, and strict types in source classes. Source syntax must remain compatible with PHP 8.2.
 
-Keep publishing behavior in the shared API. Framework adapters register services, configuration, and routes; they should not implement separate versions of authentication or validation. The host CMS owns persistence, public pages, SEO output, and media imports.
+Keep publishing behavior in the shared API. Framework adapters register services, configuration, and routes; they should not implement separate versions of authentication or validation. The host CMS owns persistence, public pages, SEO output, and media imports when using the base package. The optional `packages/laravel/` and `packages/symfony/` Composer packages provide default persistence and public pages without adding runtime dependencies to the base package. See the [package development guide](docs/packages.md).
 
 For a behavior change, add a regression test that checks the observable result. Use shared API tests for validation and publishing semantics, and the relevant framework integration test for registration or request-dispatch changes. Preserve the existing behavior of the other adapter.
 
@@ -44,15 +44,24 @@ Run the complete check before submitting code changes:
 composer check
 ```
 
-This runs strict Composer validation and PHPUnit. For focused iteration:
+This validates all three Composer manifests and runs PHPUnit, including SQLite database and public-page tests for both optional packages. Symfony tests generate and apply a real Doctrine migration. Laravel tests apply and reverse the supplied migration. The local PHP environment needs PDO SQLite. For focused iteration:
 
 ```sh
 composer test -- --filter BlostApiTest
 composer test -- --filter SymfonyIntegrationTest
 composer test -- --filter LaravelIntegrationTest
+composer test -- --filter BlogIntegrationTest
 ```
 
-The Laravel test is skipped when Laravel is absent in the Symfony-only environment. A passing local suite covers the versions installed locally; the remaining supported combinations are checked by CI.
+Laravel tests are skipped when Laravel is absent in the Symfony-only environment. A passing local suite covers the versions installed locally; the remaining supported combinations are checked by CI.
+
+Check that each optional package installs independently of the root development autoloader:
+
+```sh
+php tools/check-package-installs.php
+```
+
+This creates temporary Composer consumer projects and removes them afterward. It needs network access or a populated Composer cache.
 
 For documentation-only changes, check links, configuration names, examples, and Markdown formatting. A full test rerun is unnecessary unless the edit exposes a behavior concern. Check whitespace for every patch:
 

@@ -1,0 +1,15 @@
+{% extends '@BlostBlog/layout.html.twig' %}
+{% block title %}{{ post.metaTitle ?? post.title }}{% endblock %}
+{% block metadata %}
+    <link rel="canonical" href="{{ url('blost_blog_show', {id: post.id}) }}">
+    {% if post.metaDescription is not null %}<meta name="description" content="{{ post.metaDescription }}">{% endif %}
+    {% if post.imageUrl is not null %}<meta property="og:image" content="{{ post.imageUrl }}">{% endif %}
+{% endblock %}
+{% block content %}
+    <article>
+        <h1>{{ post.title }}</h1>
+        <time datetime="{{ post.publishedAt|date('c', 'UTC') }}">{{ post.publishedAt|date('Y-m-d', 'UTC') }}</time>
+        {% if post.imageUrl is not null %}<img src="{{ post.imageUrl }}" alt="">{% endif %}
+        <div>{{ post.content|raw }}</div>
+    </article>
+{% endblock %}

@@ -54,7 +54,9 @@ The ID must match the request UUID. The URL must be an absolute public article U
 
 The publisher must atomically create or update by the route UUID, enforced by a unique database index. Repeating a request after a timeout or a Blost bookkeeping failure must update the same CMS record. Concurrent creates require an upsert or unique-conflict handling; a transaction alone is insufficient.
 
-Null optional metadata clears the corresponding stored value. A null `published_at` preserves the existing first publication date or uses the current time for a new article. The publisher owns those persistence semantics; the API validates and passes the values through.
+Null optional metadata clears the corresponding stored value. A null `published_at` preserves the existing first publication date or uses the current time for a new article. The optional [ready-to-use packages](packages.md) provide these persistence semantics and public blog pages. Their public routes are outside `/blost/v1` and do not require the connector token. Future-dated articles are persisted immediately and become publicly visible at their publication time.
+
+The publisher owns those persistence semantics; the API validates and passes the values through.
 
 HTML is preserved for the host CMS's editorial content policy. Image URLs are passed through without downloading them. Drafts waiting for approval stay in Blost until published.
 

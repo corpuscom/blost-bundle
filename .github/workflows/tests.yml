@@ -24,11 +24,22 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: composer:v2
+          extensions: pdo_sqlite
       - if: matrix.laravel == 'none'
         run: |
           composer remove --dev --no-update laravel/framework illuminate/support illuminate/config illuminate/routing
-          composer require --dev --no-update "symfony/framework-bundle:${{ matrix.symfony }}" "symfony/config:${{ matrix.symfony }}"
+          composer require --dev --no-update "symfony/framework-bundle:${{ matrix.symfony }}" "symfony/config:${{ matrix.symfony }}" "symfony/twig-bundle:${{ matrix.symfony }}"
       - if: matrix.laravel != 'none'
-        run: composer require --dev --no-update "symfony/framework-bundle:${{ matrix.symfony }}" "symfony/config:${{ matrix.symfony }}" "illuminate/support:${{ matrix.laravel }}" "illuminate/routing:${{ matrix.laravel }}" "illuminate/config:${{ matrix.laravel }}" "laravel/framework:${{ matrix.laravel }}"
+        run: composer require --dev --no-update "symfony/framework-bundle:${{ matrix.symfony }}" "symfony/config:${{ matrix.symfony }}" "symfony/twig-bundle:${{ matrix.symfony }}" "illuminate/support:${{ matrix.laravel }}" "illuminate/routing:${{ matrix.laravel }}" "illuminate/config:${{ matrix.laravel }}" "laravel/framework:${{ matrix.laravel }}"
       - run: composer update --prefer-dist --no-interaction
       - run: composer check
+
+  packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          tools: composer:v2
+      - run: php tools/check-package-installs.php

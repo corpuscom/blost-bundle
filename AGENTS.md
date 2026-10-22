@@ -4,7 +4,7 @@
 
 `corpuscom/blost-bundle` is one Composer package that receives articles from Blost in Symfony and Laravel applications. Keep the publishing API shared; framework adapters should only register routes, configuration, and services.
 
-The host application implements persistence through `ArticlePublisher`. This package does not own a database schema, public blog pages, media storage, or SEO rendering. Examples demonstrate integrations with an application's existing CMS.
+The host application implements persistence through `ArticlePublisher`. This package does not own a database schema, public blog pages, media storage, or SEO rendering. Examples demonstrate integrations with an application's existing CMS. Optional packages in `packages/laravel/` and `packages/symfony/` provide persistence and public blog pages; these responsibilities stay outside the base package.
 
 ## Read first
 
@@ -28,6 +28,7 @@ Inspect applicable instructions, the current branch, and the working-tree diff b
 | `src/Laravel/` | Provider, controller, and Laravel routes. |
 | `config/blost.php` | Publishable Laravel configuration. |
 | `tests/` | Shared API tests and framework integration tests. |
+| `packages/laravel/`, `packages/symfony/` | Optional ready-to-use blogs, each with its own Composer manifest and usage guide. |
 | `examples/` | Eloquent and Doctrine adapters to adapt to a host CMS. |
 
 ## Implementation rules
@@ -42,7 +43,7 @@ Inspect applicable instructions, the current branch, and the working-tree diff b
 
 ## Protocol and persistence invariants
 
-- Authenticate every endpoint. An unconfigured or empty token must deny requests. Compare secrets with `hash_equals`; never log or return tokens.
+- Authenticate every connector API endpoint. Optional public blog listing/detail pages deliberately allow anonymous reads. An unconfigured or empty token must deny requests. Compare secrets with `hash_equals`; never log or return tokens.
 - Preserve protocol v1's routes: `GET /blost/v1/status` and `PUT /blost/v1/articles/{uuid}`. Successful publication returns the normalized UUID and an absolute HTTP(S) article URL.
 - Validate before invoking the publisher. Keep bounded body reads and the documented JSON, UUID, timestamp, URL, and size checks. Do not trust `Content-Length` as the sole size limit.
 - Use the stable Blost UUID for repeated updates. Publisher examples and documentation must require a unique database index and handle concurrent creation without duplicate articles.
@@ -64,7 +65,7 @@ Use isolated environments for incompatible framework dependency combinations. Do
 
 - Document installation from Packagist without requiring a custom repository or globally relaxing Composer stability.
 - Check published versions and Git tags before choosing the install constraint. When only the main development version is available, document `corpuscom/blost-bundle:dev-main` explicitly.
-- Make clear that applications must implement the publisher, supply database fields and public routes, and configure the same token in Blost.
+- For the base package, make clear that applications must implement the publisher and supply database fields and public routes. Optional blog packages provide those defaults. All installations configure the same token in Blost.
 - Keep examples compatible with their stated framework and explain application-specific model, entity, and route assumptions.
 - Do not create release tags, publish releases, change repository settings, or merge PRs unless requested.
 
