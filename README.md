@@ -4,6 +4,8 @@ Receive articles from [Blost](https://github.com/corpuscom/blost) in your existi
 
 The package handles authentication, validation, and delivery to your publisher. Your application saves articles into its own CMS and supplies the public pages, media handling, and SEO rendering.
 
+[Installation](#1-install-from-packagist) · [Publisher](#2-implement-your-article-publisher) · [Laravel](#laravel) · [Symfony](#symfony) · [Connect in Blost](#4-connect-your-application-in-blost) · [Troubleshooting](#troubleshooting)
+
 ## Requirements
 
 - PHP 8.2 or later, subject to your framework's PHP requirements.
@@ -202,13 +204,6 @@ Publishing uses `PUT /blost/v1/articles/{uuid}` with a JSON payload. See [the AP
 | HTTP 5xx | Check the publisher configuration and application logs for storage or mapping errors. |
 | Connection fails for a local address | Blost requires a public HTTPS endpoint. Use a public HTTPS tunnel for local development. |
 
-## Development
+## Contributing
 
-Clone the repository, then run:
-
-```sh
-composer install
-composer check
-```
-
-Tests boot a Symfony kernel and a Laravel application/router, exercising authentication, validation, HTML preservation, and repeated updates. CI covers Symfony 6.4 alone, Symfony 7/Laravel 12, and Symfony 8/Laravel 13. Symfony 6.4 and Laravel 12 require different major versions of HttpKernel, so they are tested in separate dependency environments.
+See [CONTRIBUTION.md](CONTRIBUTION.md) for development setup, supported dependency combinations, validation commands, and pull-request guidance. Automated agents should also read [AGENTS.md](AGENTS.md).

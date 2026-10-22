@@ -8,7 +8,8 @@ The host application implements persistence through `ArticlePublisher`. This pac
 
 ## Read first
 
-- `README.md`: installation and framework usage.
+- [README.md](README.md): installation and framework usage.
+- [CONTRIBUTION.md](CONTRIBUTION.md): development setup, validation, and pull-request conventions.
 - `docs/protocol.md`: the native API contract.
 - `composer.json`: runtime requirements, optional framework dependencies, and scripts.
 - `.github/workflows/tests.yml`: the supported dependency test matrix.
@@ -53,22 +54,11 @@ Inspect applicable instructions, the current branch, and the working-tree diff b
 
 ## Validation
 
-Install dependencies and run the existing checks for code changes:
-
-```sh
-composer install
-composer check
-```
-
-`composer check` runs strict Composer validation and PHPUnit. For iteration, use `composer test -- --filter TestName`, then run the full check before completing a code change.
+Follow the [contribution guide's validation commands](CONTRIBUTION.md#validation) and the dependency matrix in `.github/workflows/tests.yml`. Run `composer check` for code changes and `git diff --check` for every patch. Documentation-only changes require link, example, and formatting checks; do not rerun the entire suite without a behavior concern.
 
 Add focused regression tests for behavior changes. Cover the shared API and the affected framework adapter; use the existing integration tests to verify real registration and request dispatch. Authentication failures and invalid payloads must never invoke persistence.
 
-The CI matrix tests Symfony 6.4 alone, Symfony 7 with Laravel 12, and Symfony 8 with Laravel 13. Symfony 6.4 and Laravel 12 cannot share one dependency environment because they require different HttpKernel major versions. Use isolated environments or CI when checking those combinations. Do not change the package's supported constraints just to accommodate a local dependency setup.
-
-For documentation-only edits, verify referenced paths, commands, configuration names, and Markdown formatting; a full test rerun is unnecessary unless the edit exposes a behavior concern. Always run `git diff --check`.
-
-Do not commit generated or installed files: `vendor/`, `composer.lock`, `.phpunit.cache/`, or `config/reference.php`. These are ignored intentionally for this library.
+Use isolated environments for incompatible framework dependency combinations. Do not change the package's supported constraints just to accommodate a local setup, or commit temporary matrix constraints and generated files.
 
 ## Documentation and releases
 
@@ -81,13 +71,6 @@ Do not commit generated or installed files: `vendor/`, `composer.lock`, `.phpuni
 ## Git and attribution
 
 - Follow the user's requested branch and publication scope. `main` is the repository's default branch. Push only when authorized; never force-push shared history without authorization.
-- Inspect the actual diff before committing. Use a concise emoji-prefixed imperative subject and a body only when it helps explain the change.
-- For Codex (GPT-6) contributions, use the user-requested trailer exactly, separated from the body by a blank line:
-
-```text
-Co-authored-by: Codex (GPT-6) <codex@openai.com>
-```
-
-- Do not substitute `Assisted-by`. Other agents must identify their actual agent and known model/version rather than copying the Codex identity. Never invent an identity or email address, and preserve existing human trailers when amending.
-- Verify the final commit message after hooks run, since local hooks may rewrite it. Ensure the message accurately describes the change and retains the required trailer.
+- Follow the [commit and PR conventions](CONTRIBUTION.md#commits-and-pull-requests). Inspect the actual diff before committing and verify the message after hooks run.
+- Use the specified `Co-authored-by` trailer for Codex (GPT-6) contributions; do not substitute `Assisted-by` or copy that identity for another agent. Preserve existing human trailers.
 - Report what changed, the checks actually run, and any unresolved validation limits. Never describe a configured CI matrix as having passed locally unless it was executed.
