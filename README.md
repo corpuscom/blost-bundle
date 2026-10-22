@@ -1,6 +1,6 @@
 # Blost integration for Symfony and Laravel
 
-Receive articles from [Blost](https://github.com/corpuscom/blost) in your existing Symfony or Laravel application. One Composer package provides a Symfony bundle and a Laravel service provider with the same authenticated publishing API.
+Receive articles from [Blost](https://blost.ai) in your existing Symfony or Laravel application. One Composer package provides a Symfony bundle and a Laravel service provider with the same authenticated publishing API.
 
 The package handles authentication, validation, and delivery to your publisher. Your application saves articles into its own CMS and supplies the public pages, media handling, and SEO rendering.
 
