@@ -70,3 +70,7 @@ php artisan view:cache
 ```
 
 The connector uses bearer authentication outside the `web` middleware group. The read-only blog pages are public and stateless. Do not wrap connector requests in a database transaction middleware: the publisher must commit before acknowledging success.
+
+## Development
+
+Make changes in [corpuscom/blost-bundle](https://github.com/corpuscom/blost-bundle). This repository is a distribution mirror, automatically synchronized from the monorepo's `packages/laravel` directory on `main`. Submit code changes and pull requests to the monorepo.

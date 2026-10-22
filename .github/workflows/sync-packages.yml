@@ -1,0 +1,64 @@
+name: Sync packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - '.github/workflows/sync-packages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-packages
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'corpuscom/blost-bundle' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - framework: laravel
+            secret: BLOST_LARAVEL_DEPLOY_KEY
+          - framework: symfony
+            secret: BLOST_SYMFONY_DEPLOY_KEY
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Always sync the latest main, including when rerunning an older workflow.
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Split package history
+        id: split
+        env:
+          FRAMEWORK: ${{ matrix.framework }}
+        run: |
+          split=$(git subtree split --prefix="packages/$FRAMEWORK")
+          echo "commit=$split" >> "$GITHUB_OUTPUT"
+
+      - name: Push package main
+        env:
+          FRAMEWORK: ${{ matrix.framework }}
+          DEPLOY_KEY: ${{ secrets[matrix.secret] }}
+          SPLIT_COMMIT: ${{ steps.split.outputs.commit }}
+        run: |
+          if [[ -z "$DEPLOY_KEY" ]]; then
+            echo '::error::Missing package deploy key; see docs/packages.md.'
+            exit 1
+          fi
+          umask 077
+          key="$RUNNER_TEMP/blost-package-key"
+          known_hosts="$RUNNER_TEMP/blost-known-hosts"
+          trap 'rm -f "$key" "$known_hosts"' EXIT
+          printf '%s\n' "$DEPLOY_KEY" > "$key"
+          # GitHub's public Ed25519 host key, verified against https://api.github.com/meta.
+          printf '%s\n' 'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' > "$known_hosts"
+          export GIT_SSH_COMMAND="ssh -i '$key' -o IdentitiesOnly=yes -o IdentityAgent=none -o StrictHostKeyChecking=yes -o UserKnownHostsFile='$known_hosts'"
+          git push "git@github.com:corpuscom/blost-$FRAMEWORK.git" "$SPLIT_COMMIT:refs/heads/main"

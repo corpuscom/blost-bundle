@@ -30,11 +30,30 @@ Run `composer install` at the repository root. The development autoloader includ
 
 The root manifest's runtime dependencies and discovery remain unchanged. Framework-specific runtime dependencies and Laravel provider discovery are declared in each optional package's own manifest. The independent installation check uses temporary consumers with path repositories, which catches missing package autoload/dependency declarations without relying on the root development autoloader.
 
-Composer cannot install a package directly from a GitHub repository subdirectory. Maintainers must publish each package from its own distribution repository before registering it on Packagist. To prepare reviewable split branches locally:
+Composer cannot install a package directly from a GitHub repository subdirectory. The distribution repositories are [corpuscom/blost-laravel](https://github.com/corpuscom/blost-laravel) and [corpuscom/blost-symfony](https://github.com/corpuscom/blost-symfony); each has its Composer manifest at the root and can be submitted to Packagist.
+
+### Automatic synchronization
+
+Make all package changes in this monorepo. The [Sync packages workflow](../.github/workflows/sync-packages.yml) splits both package directories and pushes them to the distribution repositories' `main` branches whenever `packages/**` or the workflow changes on `main`. Other branches and pull requests do not publish packages. The workflow can also be run manually from the Actions tab on `main`, including after credential rotation or to retry a failed sync.
+
+Each run checks out the latest `main` with complete history. Runs are serialized and pushes are ordinary fast-forward pushes; divergent distribution history fails visibly rather than being overwritten. Do not commit directly to the distribution repositories. Commit authors and trailers are preserved by the subtree split. Tags and releases are not copied or created.
+
+Each destination repository has its own write-enabled SSH deploy key. The matching private key is stored only as an Actions secret in `corpuscom/blost-bundle`:
+
+| Destination | Source repository secret |
+| --- | --- |
+| `corpuscom/blost-laravel` | `BLOST_LARAVEL_DEPLOY_KEY` |
+| `corpuscom/blost-symfony` | `BLOST_SYMFONY_DEPLOY_KEY` |
+
+To rotate a key, generate a new Ed25519 key pair, add its public key as a write-enabled deploy key on the matching destination, replace the source repository's matching secret with the private key, run the workflow manually, then remove the old destination deploy key. Never commit private keys. The workflow uses a pinned GitHub SSH host key; if GitHub rotates it, verify the replacement through GitHub's official documentation/API before updating the workflow.
+
+Shared bundle changes do not need copying into the distribution repositories: both packages depend on `corpuscom/blost-bundle` through Composer. Packagist registrations and webhook/update configuration remain separate from repository synchronization.
+
+For a local inspection without publishing:
 
 ```sh
 git subtree split --prefix=packages/laravel --branch=split/laravel
 git subtree split --prefix=packages/symfony --branch=split/symfony
 ```
 
-Push these branches to the respective package repositories only as part of an authorized publication. Each split contains its own manifest, source, templates, usage guide, and license. Keep the base `dev-main` dependency explicit until compatible stable tags exist; do not tag a split independently with an incompatible base constraint. Creating distribution repositories, Packagist registrations, release tags, and automatic split publication is a separate maintainer action.
+Each split contains its own manifest, source, templates, usage guide, and license. Keep the base `dev-main` dependency explicit until compatible stable tags exist. Release tags and Packagist publication remain maintainer actions.

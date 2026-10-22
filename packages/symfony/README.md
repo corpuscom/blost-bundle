@@ -98,3 +98,7 @@ Rebuild your production cache after configuration, template, or route changes:
 ```sh
 php bin/console cache:clear --env=prod
 ```
+
+## Development
+
+Make changes in [corpuscom/blost-bundle](https://github.com/corpuscom/blost-bundle). This repository is a distribution mirror, automatically synchronized from the monorepo's `packages/symfony` directory on `main`. Submit code changes and pull requests to the monorepo.
