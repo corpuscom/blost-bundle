@@ -18,13 +18,13 @@ Framework dependencies are optional: installing in Laravel does not install Symf
 
 ## 1. Install from Packagist
 
-The package is available on [Packagist](https://packagist.org/packages/corpuscom/blost-bundle). Until a tagged release is available, install the `main` development branch explicitly:
+The package is available on [Packagist](https://packagist.org/packages/corpuscom/blost-bundle). Install the stable 1.x release:
 
 ```sh
-composer require corpuscom/blost-bundle:dev-main
+composer require "corpuscom/blost-bundle:^1.0"
 ```
 
-No custom Composer repository or project-wide `minimum-stability` change is needed. Once tagged releases are available, use `composer require corpuscom/blost-bundle` for a stable release.
+No custom Composer repository or project-wide `minimum-stability` change is needed.
 
 Generate a token:
 
@@ -197,7 +197,7 @@ Publishing uses `PUT /blost/v1/articles/{uuid}` with a JSON payload. See [the AP
 
 | Symptom | Check |
 | --- | --- |
-| Composer cannot find a stable version | Install `corpuscom/blost-bundle:dev-main` until a tagged release is available. |
+| Composer cannot find a stable version | Run `composer show corpuscom/blost-bundle --all` and check that your PHP/framework versions meet the 1.x requirements. |
 | HTTP 401 | Match the token in Blost and the receiving application; refresh cached configuration and ensure your proxy forwards `Authorization` to PHP. |
 | HTTP 404 | Register the framework routes and include any application subdirectory in the connector URL. |
 | Login page or redirect instead of JSON | Allow the connector routes through your application firewall and use their final HTTPS URL. Blost does not follow redirects. |

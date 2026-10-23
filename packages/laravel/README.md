@@ -8,13 +8,13 @@ A ready-to-use blog for Laravel 12 or 13, built on [the shared Blost publishing 
 
 ## Install
 
-Install from [Packagist](https://packagist.org/packages/corpuscom/blost-laravel) in your application directory. Until tagged releases are available, require both the integration and its shared dependency explicitly at `dev-main`:
+Install from [Packagist](https://packagist.org/packages/corpuscom/blost-laravel) in your application directory. Install the stable 1.x release:
 
 ```sh
-composer require corpuscom/blost-laravel:dev-main corpuscom/blost-bundle:dev-main
+composer require "corpuscom/blost-laravel:^1.0"
 ```
 
-No repository clone, custom Composer repository, or project-wide `minimum-stability` change is needed. The explicit shared dependency allows Composer to install its development version while keeping your application's normal stability policy.
+No repository clone, custom Composer repository, or project-wide `minimum-stability` change is needed. Composer installs the compatible stable shared bundle automatically.
 
 If you used the previous local checkout instructions, remove that path repository with `composer config --unset repositories.blost-laravel` before running the installation command.
 

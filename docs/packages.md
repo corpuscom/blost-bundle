@@ -8,7 +8,7 @@ The repository contains three Composer packages:
 | [corpuscom/blost-laravel](https://packagist.org/packages/corpuscom/blost-laravel) | Eloquent storage, publishable migration, publisher, and Blade blog pages. | [Laravel](../packages/laravel/README.md) |
 | [corpuscom/blost-symfony](https://packagist.org/packages/corpuscom/blost-symfony) | Doctrine entity and mapping, publisher, migration generation, and Twig blog pages. | [Symfony](../packages/symfony/README.md) |
 
-All three packages are published on Packagist. Currently only `dev-main` is available; there are no tagged releases. Install your chosen framework integration with its shared `corpuscom/blost-bundle:dev-main` dependency explicitly, as shown in the [Laravel guide](../packages/laravel/README.md#install) or [Symfony guide](../packages/symfony/README.md#install). No repository clone, custom Composer repository, or project-wide `minimum-stability` change is needed.
+All three packages are published on Packagist. Stable 1.x releases are available for all three. Install your chosen framework integration with a `^1.0` constraint; Composer installs its compatible stable shared bundle automatically, as shown in the [Laravel guide](../packages/laravel/README.md#install) or [Symfony guide](../packages/symfony/README.md#install). No repository clone, custom Composer repository, or project-wide `minimum-stability` change is needed.
 
 Each optional package depends on the base package. Authentication, payload validation, and the wire protocol have one implementation. Host applications using an existing CMS can keep their current publisher and avoid installing either optional package.
 
@@ -56,4 +56,12 @@ git subtree split --prefix=packages/laravel --branch=split/laravel
 git subtree split --prefix=packages/symfony --branch=split/symfony
 ```
 
-Each split contains its own manifest, source, templates, usage guide, and license. Keep the base `dev-main` dependency explicit until compatible stable tags exist. Release tags remain maintainer actions; repository synchronization does not create stable releases.
+Each split contains its own manifest, source, templates, usage guide, and license. The framework packages require `corpuscom/blost-bundle:^1.0`. Release tags remain maintainer actions; repository synchronization does not create stable releases.
+
+## Stable releases
+
+All three repositories use matching `v1.0.0` tags for the initial stable release. Install with `^1.0` to receive compatible 1.x updates. The shared API supports protocol v1; framework-specific setup remains in each package guide.
+
+Before releasing, update installation documentation and dependency constraints in this monorepo, run the validation commands, and push the changes to `main`. Wait for CI and package synchronization to succeed, then verify that both distribution repository trees match their package directories. Tag and publish the shared bundle first, followed by the matching commits in each distribution repository. Never tag the monorepo commit as a framework package release. Verify that Packagist indexes each tag and that stable consumer installations resolve without relaxing stability.
+
+Synchronization only updates branch history; maintainers create tags and GitHub releases separately in each repository.

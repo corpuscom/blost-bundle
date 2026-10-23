@@ -23,10 +23,10 @@ try {
         $manifest = [
             'name' => 'blost/test-consumer',
             'repositories' => [
-                ['type' => 'path', 'url' => $root . '/packages/' . $framework, 'options' => ['symlink' => false, 'versions' => [$package => 'dev-main']]],
-                ['type' => 'path', 'url' => $root, 'options' => ['symlink' => false, 'versions' => ['corpuscom/blost-bundle' => 'dev-main']]],
+                ['type' => 'path', 'url' => $root . '/packages/' . $framework, 'options' => ['symlink' => false, 'versions' => [$package => '1.0.0']]],
+                ['type' => 'path', 'url' => $root, 'options' => ['symlink' => false, 'versions' => ['corpuscom/blost-bundle' => '1.0.0']]],
             ],
-            'require' => [$package => 'dev-main', 'corpuscom/blost-bundle' => 'dev-main'],
+            'require' => [$package => '^1.0'],
             'config' => ['allow-plugins' => false],
         ];
         file_put_contents($directory . '/composer.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
